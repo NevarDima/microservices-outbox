@@ -1,0 +1,88 @@
+version: '3.9'
+
+services:
+
+  mysql-service:
+    container_name: mysql-container
+    image: debezium/example-mysql
+    restart: always
+    environment:
+      MYSQL_USER: 'admin'
+      MYSQL_PASSWORD: '123'
+      MYSQL_DATABASE: 'orders_db'
+      MYSQL_ROOT_PASSWORD: 'root'
+    ports:
+      - '3306:3306'
+    networks:
+      - backend
+
+  zookeeper-service:
+    container_name: zookeeper-container
+    image: debezium/zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: '2181'
+      ZOOKEEPER_TICK_TIME: '2000'
+    ports:
+      - '2181:2181'
+      - '2888:2888'
+      - '3888:3888'
+    depends_on:
+      - mysql-service
+    networks:
+      - backend
+
+  kafka-service:
+    container_name: kafka-container
+    image: debezium/kafka
+    environment:
+      KAFKA_BROKER_ID: '1'
+      ZOOKEEPER_CONNECT: 'zookeeper-service:2181'
+    ports:
+      - '9092:9092'
+    depends_on:
+      - mysql-service
+      - zookeeper-service
+    networks:
+      - backend
+
+  connect-service:
+    container_name: connect-container
+    image: debezium/connect
+    environment:
+      GROUP_ID: 1
+      BOOTSTRAP_SERVERS: 'kafka-service:9092'
+      CONFIG_STORAGE_TOPIC: my_connect_configs
+      OFFSET_STORAGE_TOPIC: my_connect_offsets
+      STATUS_STORAGE_TOPIC: my_connect_statuses
+    ports:
+      - '8083:8083'
+    depends_on:
+      - mysql-service
+      - zookeeper-service
+      - kafka-service
+    networks:
+      backend:
+
+  orders-service:
+    container_name: orders-container
+    ports:
+      - '8081:8080'
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - mysql-service
+      - zookeeper-service
+      - kafka-service
+      - connect-service
+    environment:
+      spring.datasource.url: 'jdbc:mysql://mysql-service:3306/orders_db'
+      spring.datasource.username: 'admin'
+      spring.datasource.password: '123'
+      spring.kafka.bootstrap-servers: 'kafka-service:9092'
+    networks:
+      - backend
+
+networks:
+  backend:
+    name: coffee_shop

@@ -1,0 +1,19 @@
+version: '3.9'
+
+services:
+  delivery-service:
+    container_name: delivery-container
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      spring.kafka.bootstrap-servers: 'kafka-service:9092'
+    ports:
+      - '8082:8080'
+    networks:
+      backend:
+
+networks:
+  backend:
+    external:
+      name: coffee_shop
