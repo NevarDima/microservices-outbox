@@ -26,8 +26,6 @@ services:
       - '2181:2181'
       - '2888:2888'
       - '3888:3888'
-    depends_on:
-      - mysql-service
     networks:
       - backend
 
@@ -39,9 +37,6 @@ services:
       ZOOKEEPER_CONNECT: 'zookeeper-service:2181'
     ports:
       - '9092:9092'
-    depends_on:
-      - mysql-service
-      - zookeeper-service
     networks:
       - backend
 
@@ -56,10 +51,6 @@ services:
       STATUS_STORAGE_TOPIC: my_connect_statuses
     ports:
       - '8083:8083'
-    depends_on:
-      - mysql-service
-      - zookeeper-service
-      - kafka-service
     networks:
       backend:
 
@@ -70,11 +61,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    depends_on:
-      - mysql-service
-      - zookeeper-service
-      - kafka-service
-      - connect-service
     environment:
       spring.datasource.url: 'jdbc:mysql://mysql-service:3306/orders_db'
       spring.datasource.username: 'admin'

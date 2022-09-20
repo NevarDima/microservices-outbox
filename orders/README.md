@@ -1,9 +1,13 @@
-Transactional Outbox design pattern in Spring Boot Microservices. 
+Transactional Outbox design pattern in Spring Boot Microservices.
 
 This project consists of 2 projects, orders and delivery services.
 
+**! To build this project you need to have docker installed in your OS !**
+
 How to build:
+
 - Orders-service
+
 1) maven install
 2) docker compose
 3) curl --location --request POST 'http://localhost:8083/connectors' \

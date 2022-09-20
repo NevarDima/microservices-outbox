@@ -15,5 +15,5 @@ services:
 
 networks:
   backend:
-    external:
-      name: coffee_shop
+    name: coffee_shop
+    external: true
