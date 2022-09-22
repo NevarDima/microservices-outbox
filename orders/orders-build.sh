@@ -1,25 +1,10 @@
 #!/bin/bash
 
-echo --- Up mysql database in docker container ---
-docker-compose up mysql-service -d
+echo --- Mvn clean install orders-service ---
+mvn clean install
 
-echo --- Up zookeeper service in docker container ---
-docker-compose up zookeeper-service -d
-
-echo --- Up kafka service in docker container ---
-docker-compose up kafka-service -d
-
-echo --- Up connect service in docker container ---
-docker-compose up connect-service -d
-
-echo --- Mvn clean orders-service ---
-mvn clean
-
-echo --- Mvn install orders-service ---
-mvn install
-
-echo --- Up orders service in docker container ---
-docker-compose up orders-service -d
+echo --- Up all services in docker container ---
+docker-compose up -d
 
 echo --- Activate debezium connector ---
 curl --location --request POST 'http://localhost:8083/connectors' \
